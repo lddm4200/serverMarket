@@ -18,6 +18,11 @@ app.use(cors());
 app.use("/api/auth",authRoutes)
 app.use("/api/product", productRoutes);
 
+// Trang 404
+app.use((req, res) => {
+  res.status(404).send("404 Not Found: Trang không tồn tại.");
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

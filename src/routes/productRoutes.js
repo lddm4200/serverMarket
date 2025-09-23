@@ -10,11 +10,11 @@ router.post("/" ,protectRoute, async (req, res) => {
   try {
     const { title, caption, image, price, rating } = req.body;  
 
-    if (!title || !caption || !image || !price || !rating) {
+    if (!title || !caption || !image || !price ) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
 
-    if(isNaN(price) || isNaN(rating)) {
+    if(isNaN(price) ) {
       return res.status(400).json({ msg: "Price and rating must be numbers" });
     }
 
@@ -39,12 +39,12 @@ router.post("/" ,protectRoute, async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/",protectRoute, async (req, res) => {
   try {
     const page= req.query.page || 1;
     const limit = req.query.limit || 5;
     const skip = (page - 1) * limit;
-    const products = await Product.find().srot({createAt: -1}).skip(skip).limit(limit).populate("user","username profileImage");
+    const products = await Product.find().sort({createAt: -1}).skip(skip).limit(limit).populate("user","username profileImage");
     const totalPrrroduct = await Product.countDocuments();
     res.send({
       products,

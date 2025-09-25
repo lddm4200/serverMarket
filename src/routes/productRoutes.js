@@ -61,17 +61,6 @@ router.get("/", protectRoute, async (req, res) => {
   }
 });
 
-router.get("/:id", protectRoute, async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-     res.send({
-      product
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
 
 router.get("/user", protectRoute, async (req, res) => {
   try {

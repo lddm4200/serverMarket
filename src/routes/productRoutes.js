@@ -41,8 +41,9 @@ router.post("/", protectRoute, async (req, res) => {
 router.get("/", protectRoute, async (req, res) => {
   try {
     const page = req.query.page || 1;
-    const limit = req.query.limit || 5;
+    const limit = req.query.limit || 2;
     const skip = (page - 1) * limit;
+
     const products = await Product.find()
       .sort({ createAt: -1 })
       .skip(skip)
@@ -51,9 +52,9 @@ router.get("/", protectRoute, async (req, res) => {
     const totalPrrroduct = await Product.countDocuments();
     res.send({
       products,
+      currentPage: page,
       totalPrrroduct,
-      currenPage: page,
-      totalPage: Math.ceil(totalPrrroduct / limit),
+      totalPages: Math.ceil(totalPrrroduct / limit),
     });
   } catch (error) {
     console.log(error.message);
@@ -61,6 +62,15 @@ router.get("/", protectRoute, async (req, res) => {
   }
 });
 
+router.get("/productDetail/:id", protectRoute, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    res.send({ product });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
 
 router.get("/user", protectRoute, async (req, res) => {
   try {

@@ -7,18 +7,19 @@ const router = express.Router();
 
 router.post("/", protectRoute, async (req, res) => {
   try {
-    const { item } = req.body;
+    const { item, quantity } = req.body;
     if (!item) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
     const newCart = new Cart({
       item,
+      quantity,
       user: req.user._id,
     });
 
     await newCart.save();
 
-    res.status(201).json({ msg: "Cart created successfully", newCart });
+    res.status(201).json({ newCart });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ msg: "Server error" });

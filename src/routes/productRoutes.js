@@ -112,4 +112,41 @@ router.delete("/:id", protectRoute, async (req, res) => {
   }
 });
 
+router.put("/:id", protectRoute, async (req, res) => {
+  try {
+    const { title, caption, image, price, rating } = req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+
+    // Kiểm tra quyền sửa
+    if (product.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ msg: "User not authorized" });
+    }
+
+    // Nếu có ảnh mới thì upload lên cloudinary
+    let imageUrl = product.image;
+    if (image && image !== product.image) {
+      const uploadResponse = await cloudinary.uploader.upload(image);
+      imageUrl = uploadResponse.secure_url;
+    }
+
+    // Cập nhật thông tin
+    product.title = title || product.title;
+    product.caption = caption || product.caption;
+    product.image = imageUrl;
+    product.price = price !== undefined ? parseFloat(price) : product.price;
+    product.rating = rating !== undefined ? parseFloat(rating) : product.rating;
+
+    await product.save();
+
+    res.json({ msg: "Product updated successfully", product });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 export default router;

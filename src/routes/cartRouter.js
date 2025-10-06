@@ -36,4 +36,37 @@ router.get("/", protectRoute, async (req, res) => {
   }
 });
 
+
+
+router.delete("/delete/:id", protectRoute, async (req, res) => {
+  try {
+    const cart = await Cart.findById(req.params.id);
+    if (!cart) {
+      return res.status(404).json({ msg: "Cart not found" });
+    }
+    if (cart.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ msg: "User not authorized" });
+    }
+    await cart.deleteOne();
+    res.json({ msg: "Cart removed", cart });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+
+
+router.delete("/all", protectRoute, async (req, res) => {
+  try {
+    const result = await Cart.deleteMany({ user: req.user._id });
+    res.json({ msg: "All cart items removed", deletedCount: result.deletedCount });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// ...existing code...
+
 export default router;

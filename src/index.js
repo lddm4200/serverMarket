@@ -5,6 +5,7 @@ import job from "./lib/cron.js";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRouter.js";
+import lunawear from "./routes/lunawearRouter.js";
 import { connectDB } from "./lib/db.js";
 
 const app = express();
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true })); // Giới hạn 
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/lunawear", lunawear);
 
 // Trang 404
 app.use((req, res) => {

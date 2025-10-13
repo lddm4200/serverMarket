@@ -8,6 +8,17 @@ const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15d" });
 };
 
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find().sort({ createAt: -1 });
+    res.send(users)
+    res.status(200).json(users);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 router.post("/register", async (req, res) => {
   try {
     const { email, username, password } = req.body;
@@ -47,15 +58,15 @@ router.post("/register", async (req, res) => {
     const token = generateToken(user._id);
 
     res.status(201).json({
-        token,
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          profileImage: user.profileImage,
-          createdAt: user.createdAt,
-        },
-      });
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        profileImage: user.profileImage,
+        createdAt: user.createdAt,
+      },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });
@@ -64,7 +75,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body; 
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ msg: "Please enter all fields" });
@@ -73,23 +84,23 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: "Invalid credentials" });
-    } 
-    const isPasswordCorrect = await user.comparePassword(password)
+    }
+    const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
     const token = generateToken(user._id);
     res.status(200).json({
-        token,
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          profileImage: user.profileImage,
-          createdAt: user.createdAt,
-        },
-      });
-  }catch (err) {
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        profileImage: user.profileImage,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });
   }

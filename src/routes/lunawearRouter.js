@@ -82,4 +82,106 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const lunawear = await Lunawear.findById(req.params.id);
+    if (!lunawear) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+
+    const {
+      name,
+      category,
+      categoryLabel,
+      description,
+      price,
+      originalPrice,
+      colors,
+      sizes,
+      rating,
+      reviews,
+      tag,
+      releaseDate,
+      featuredScore,
+      pattern,
+      image,
+    } = req.body;
+
+    if (
+      !name ||
+      !category ||
+      !categoryLabel ||
+      !description ||
+      !price ||
+      !colors ||
+      !sizes ||
+      !rating ||
+      !reviews ||
+      !releaseDate ||
+      !featuredScore ||
+      !pattern ||
+      !image
+    ) {
+      return res.status(400).json({ msg: "Please enter all fields" });
+    }
+
+    let imageUrl = lunawear.image;
+    if (image !== lunawear.image) {
+      const uploadReponse = await cloudinary.uploader.upload(image);
+      imageUrl = uploadReponse.secure_url;
+    }
+
+    lunawear.name = name;
+    lunawear.category = category;
+    lunawear.categoryLabel = categoryLabel;
+    lunawear.description = description;
+    lunawear.price = price;
+    lunawear.originalPrice = originalPrice;
+    lunawear.colors = colors;
+    lunawear.sizes = sizes;
+    lunawear.rating = rating;
+    lunawear.reviews = reviews;
+    lunawear.tag = tag;
+    lunawear.releaseDate = releaseDate;
+    lunawear.featuredScore = featuredScore;
+    lunawear.pattern = pattern;
+    lunawear.image = imageUrl;
+    await lunawear.save();
+
+    res.status(200).json({ msg: "Product updated successfully", lunawear });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const lunawear = await Lunawear.findById(req.params.id);
+    if (!lunawear) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+
+    await lunawear.deleteOne();
+
+    res.status(200).json({ msg: "Product deleted successfully" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const lunawear = await Lunawear.findById(req.params.id);
+    if (!lunawear) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+    res.status(200).json({ lunawear });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 export default router;
